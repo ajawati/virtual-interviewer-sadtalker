@@ -1,0 +1,226 @@
+Virtual Interviewer AI (SadTalker Integration) Documentation
+Table of Contents
+Overview
+
+Features
+
+Architecture
+
+Installation & Setup
+
+Usage Guide
+
+SadTalker Integration
+
+API Endpoints
+
+Configuration
+
+Customization
+
+Use Cases
+
+Troubleshooting
+
+Future Enhancements
+
+1. Overview
+Virtual Interviewer AI is a browser-based interview simulation app that uses the open-source SadTalker engine to generate a realistic talking avatar. The avatar asks professional questions, listens to user responses, and integrates with your existing filler-word analysis backend—100% free, no subscription required.
+
+2. Features
+Welcome screen with branding and feature highlights
+
+Seven professional interview questions
+
+Realistic AI avatar powered by SadTalker (lip-sync, facial animation)
+
+Text-to-speech for question narration (Web Speech API)
+
+Loading & status indicators for avatar generation and connection
+
+Visual recording interface with animated controls
+
+Question progress tracking and session timer
+
+Integration hook for voice analysis backend
+
+Video caching for performance and offline playback
+
+Responsive, glassmorphic UI design with Tailwind CSS
+
+Graceful fallback to text questions if avatar generation fails
+
+3. Architecture
+text
+[Browser UI] 
+  ├─ React Components (Welcome, AvatarArea, Controls)
+  ├─ SadTalker Service (calls Hugging Face API)
+  ├─ TTS Module (Web Speech API)
+  ├─ Recording Module (MediaRecorder)
+  └─ Analysis Integration (POST to /api/voice-analysis)
+
+[Backend (Optional)]
+  ├─ /api/sadtalker/generate  → Proxy to Hugging Face SadTalker
+  └─ /api/voice-analysis/process → Your existing analysis
+4. Installation & Setup
+Prerequisites
+Node.js ≥ 18
+
+Python 3.8+ (for optional local proxy)
+
+Git
+
+Steps
+Clone Repository
+git clone <repo-url> && cd virtual-interviewer-sadtalker
+
+Install Frontend Dependencies
+
+bash
+cd frontend
+npm install
+(Optional) Setup Backend Proxy
+
+bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload
+Run App
+
+bash
+# If using Docker Compose:
+docker compose up --build
+
+# Or, local dev:
+cd frontend && npm run dev  # http://localhost:3000
+5. Usage Guide
+Open http://localhost:3000
+
+Click Start Interview
+
+Wait for “Connecting to AI Avatar…”
+
+Avatar speaks Question 1 in realistic video
+
+Click Start Recording to answer
+
+Click Next when done
+
+Repeat through all 7 questions
+
+View performance analysis at end
+
+6. SadTalker Integration
+API Endpoint:
+POST /api/sadtalker/generate
+
+Request: multipart/form-data
+
+source_image: Professional headshot (JPEG/PNG)
+
+driven_audio: Question audio blob (WAV/MP3)
+
+enhancer: gfpgan
+
+preprocess: crop
+
+Response: binary MP4 video
+
+Frontend Flow:
+
+Convert question text → speech via Web Speech API
+
+Upload photo + audio → proxy endpoint
+
+Receive avatar video blob
+
+Render <video> element in avatar area
+
+7. API Endpoints
+/api/sadtalker/generate
+Generate talking avatar video.
+
+Method: POST
+
+Body: form-data
+
+Response: MP4 binary
+
+/api/voice-analysis/process
+Your existing analysis endpoint.
+
+Method: POST
+
+Body: form-data (audio)
+
+Response: JSON analysis
+
+8. Configuration
+Variable	Description
+SADTALKER_API_URL	Hugging Face Spaces base URL
+DEFAULT_AVATAR_IMAGE_PATH	Path to interviewer headshot
+TTS_VOICE	e.g., en-US-ProfessionalFemale
+CACHE_MAX_SIZE_MB	Max cache size for videos
+FALLBACK_TO_TEXT	true/false on API failure
+Place values in .env or front-end config.js.
+
+9. Customization
+Questions: Edit questions array in app.js.
+
+Avatar Image: Replace professional_interviewer.jpg.
+
+UI Theme: Modify Tailwind config (tailwind.config.js).
+
+TTS Settings: Adjust rate/pitch in ttsConfig.
+
+Cache Settings: Tweak CACHE_MAX_SIZE_MB.
+
+10. Use Cases
+Interview Practice Platform
+Realistic avatar simulates HR interviews for candidates.
+
+E-Learning & Training
+AI instructor avatar delivers interactive lessons.
+
+Customer Onboarding
+Virtual agent guides users through workflows.
+
+Accessibility Tools
+Avatar reads content aloud for visually impaired users.
+
+Demo & Sales
+AI spokesperson presents product features interactively.
+
+11. Troubleshooting
+Avatar Generation Fails:
+
+Check network access to Hugging Face
+
+Verify SADTALKER_API_URL and CORS setup
+
+Inspect console for API errors
+
+Video Playback Issues:
+
+Ensure <video> supports MP4
+
+Check blob response handling
+
+Recording Not Starting:
+
+Verify microphone permissions
+
+Ensure MediaRecorder is supported
+
+12. Future Enhancements
+Batch Pre-Generation of all avatar videos
+
+Local SadTalker installation for offline generation
+
+Avatar Customization UI (select different faces)
+
+Emotion & Gesture Control via advanced SadTalker settings
+
+Multi-Language Support using free TTS backends
+
+Live Real-Time Streaming (no pre-generation)

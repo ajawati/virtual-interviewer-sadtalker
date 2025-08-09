@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Interviewer Avatar with SadTalker AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>Virtual Interviewer AI</h1>
+                </div>
+                <div class="header-status">
+                    <div class="status-indicator" id="connection-status">
+                        <div class="status-dot"></div>
+                        <span>Initializing...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcome-screen">
+                <div class="welcome-card glass-card">
+                    <div class="welcome-header">
+                        <i class="fas fa-microphone-alt welcome-icon"></i>
+                        <h2>Welcome to Your AI Interview</h2>
+                        <p>Experience a realistic interview with our SadTalker-powered AI interviewer avatar.</p>
+                    </div>
+                    
+                    <div class="welcome-features">
+                        <div class="feature-item">
+                            <i class="fas fa-video"></i>
+                            <span>SadTalker AI Avatar</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-brain"></i>
+                            <span>Realistic Facial Animation</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Performance Analysis</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn--primary btn--lg start-interview-btn" id="start-interview">
+                        <i class="fas fa-play"></i>
+                        Start Interview
+                    </button>
+                    
+                    <div class="tech-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Powered by SadTalker AI Technology</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interview Screen -->
+            <div class="interview-screen hidden" id="interview-screen">
+                <div class="interview-layout">
+                    <!-- Avatar Section -->
+                    <div class="avatar-section">
+                        <div class="avatar-container glass-card">
+                            <div class="avatar-loading" id="avatar-loading">
+                                <div class="loading-spinner"></div>
+                                <p id="loading-message">Connecting to AI Avatar...</p>
+                                <div class="loading-progress">
+                                    <div class="progress-bar-small">
+                                        <div class="progress-fill-small" id="avatar-progress"></div>
+                                    </div>
+                                    <span class="progress-text-small" id="progress-text">Initializing SadTalker...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="avatar-display hidden" id="avatar-display">
+                                <div class="avatar-video-container">
+                                    <video 
+                                        id="avatar-video" 
+                                        class="avatar-video"
+                                        autoplay 
+                                        muted 
+                                        playsinline
+                                        onended="window.interviewApp?.handleAvatarVideoEnd()"
+                                    >
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support video playback.
+                                    </video>
+                                    
+                                    <!-- Fallback static avatar for when video is loading -->
+                                    <div class="fallback-avatar" id="fallback-avatar">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400' viewBox='0 0 300 400'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='400' fill='url(%23bg)'/%3E%3Ccircle cx='150' cy='120' r='60' fill='%23fdbcb4'/%3E%3Crect x='120' y='180' width='60' height='120' fill='%23f8f9fa'/%3E%3Crect x='100' y='180' width='100' height='140' fill='%231a1a2e' rx='20'/%3E%3Ctext x='150' y='350' text-anchor='middle' fill='white' font-family='Arial' font-size='14'%3EProfessional Interviewer%3C/text%3E%3C/svg%3E" alt="Professional Interviewer" />
+                                    </div>
+                                    
+                                    <!-- Video generation status -->
+                                    <div class="video-status hidden" id="video-status">
+                                        <div class="status-overlay">
+                                            <div class="status-content">
+                                                <div class="status-spinner"></div>
+                                                <p id="video-status-text">Generating avatar response...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="avatar-info">
+                                    <h3>AI Professional Interviewer</h3>
+                                    <span class="avatar-status" id="current-avatar-status">Ready...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="avatar-controls">
+                                <button class="control-btn" id="mute-avatar" title="Mute Avatar">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                                <button class="control-btn" id="pause-avatar" title="Pause Avatar">
+                                    <i class="fas fa-pause"></i>
+                                </button>
+                                <button class="control-btn" id="regenerate-avatar" title="Regenerate Response">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls Panel -->
+                    <div class="controls-section">
+                        <div class="progress-panel glass-card">
+                            <h3>Interview Progress</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="current-question">1</span> of <span id="total-questions">7</span> questions
+                            </div>
+                            
+                            <div class="session-timer">
+                                <i class="fas fa-clock"></i>
+                                <span id="session-time">00:00</span>
+                            </div>
+                        </div>
+
+                        <div class="recording-panel glass-card">
+                            <h3>Your Response</h3>
+                            <div class="recording-controls">
+                                <button class="record-btn" id="record-btn" disabled>
+                                    <div class="record-icon">
+                                        <i class="fas fa-microphone"></i>
+                                    </div>
+                                    <span class="record-text">Wait for question...</span>
+                                </button>
+                            </div>
+                            
+                            <div class="audio-visualization hidden" id="audio-viz">
+                                <div class="waveform">
+                                    <div class="wave-line"></div>
+                                    <div class="wave-line"></div>
+                                    <div class="wave-line"></div>
+                                    <div class="wave-line"></div>
+                                    <div class="wave-line"></div>
+                                </div>
+                                <p class="recording-status">Recording in progress...</p>
+                            </div>
+                            
+                            <div class="transcription hidden" id="transcription">
+                                <h4>Your Response:</h4>
+                                <p id="transcription-text"></p>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn--secondary" id="skip-question">
+                                Skip Question
+                            </button>
+                            <button class="btn btn--primary" id="next-question" disabled>
+                                Next Question
+                            </button>
+                            <button class="btn btn--outline" id="end-interview">
+                                End Interview
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Display -->
+                <div class="question-section glass-card">
+                    <div class="question-content">
+                        <h3 id="question-text">Loading question...</h3>
+                        <div class="question-meta">
+                            <span class="question-category" id="question-category">introduction</span>
+                            <span class="expected-time">
+                                <i class="fas fa-clock"></i>
+                                <span id="expected-duration">120</span>s suggested
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="results-screen hidden" id="results-screen">
+                <div class="results-container glass-card">
+                    <div class="results-header">
+                        <i class="fas fa-chart-bar results-icon"></i>
+                        <h2>Interview Analysis Complete</h2>
+                        <p>Here's your performance summary powered by our AI voice analysis.</p>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-score">
+                                <span class="score-number" id="confidence-score">85</span>
+                                <span class="score-label">Confidence Score</span>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-metric">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span class="metric-label">Speaking Pace</span>
+                                <span class="metric-value" id="speaking-pace">Optimal</span>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-metric">
+                                <i class="fas fa-percent"></i>
+                                <span class="metric-label">Filler Words</span>
+                                <span class="metric-value">
+                                    <span id="filler-percentage">2.1</span>%
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-rating">
+                                <span class="rating-text" id="overall-rating">Excellent</span>
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recommendations">
+                        <h3>Recommendations</h3>
+                        <div class="recommendation-list" id="recommendations-list">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn--primary" id="restart-interview">
+                            <i class="fas fa-redo"></i>
+                            Start New Interview
+                        </button>
+                        <button class="btn btn--secondary" id="download-report">
+                            <i class="fas fa-download"></i>
+                            Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <div class="integration-info">
+                    <span>Powered by SadTalker AI Avatar Technology</span>
+                    <div class="tech-badges">
+                        <span class="badge">SadTalker AI</span>
+                        <span class="badge">Voice Sync</span>
+                        <span class="badge">Real-time Generation</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
